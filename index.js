@@ -16,7 +16,14 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 async function run(){
     try{
         await client.connect();
-        console.log('database connected with mongodab')
+        console.log('database connected with mongodab');
+        const serviceCollection =client.db('doctor_portal').collection('services');
+        app.get('/services',async(req,res)=>{
+            const query ='';
+            const cursor =serviceCollection.find(query);
+            const services =await cursor.toArray();
+            res.send(services);
+        })
     }
     finally{
 
