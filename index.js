@@ -19,6 +19,7 @@ async function run(){
         console.log('database connected with mongodab');
         const serviceCollection =client.db('doctor_portal').collection('services');
         const bookingCollection =client.db('doctor_portal').collection('bookings');
+        const userCollection =client.db('doctor_portal').collection('users');
 
       
         //data loadidng
@@ -29,13 +30,24 @@ async function run(){
             res.send(services);
         });
 
-
+        app.put('/user/:email',async(req,res)=>{
+          const email=req.params.email;
+          const user =req.body;
+          const filter ={email:email};
+          const option ={upsert: true};
+          const updateDoc = {
+            $set: user,
+          };
+          const result =await userCollection.updateOne(filter,updateDoc,option);
+          res.send(result);
+        })
           //data inserting
         //api naming convention
         /**
          * app.get('/booking)//get all booking in this collection or dget more than one or by filtering
          * app.get('/booking/:id)//get a specific id
          * app.post('/booking)// add a new booking 
+         * app.pot(booking/id) user jodi thake take update kore dibo  upsert update (if exist) insert (if doesnot exist)
          * app.delete('/booking/:id')// updating one 
          */
 
