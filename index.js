@@ -48,6 +48,23 @@ async function run(){
             res.send(services);
         });
 
+
+        app.get('/user',verifyJWT, async(req,res)=>{
+          const user=await userCollection.find().toArray();
+          res.send(user);
+        });
+
+
+        app.put('/user/admin/:email', verifyJWT, async(req,res)=>{
+          const email=req.params.email;
+          const filter ={email:email}; 
+          const updateDoc = {
+            $set: {role: 'admin'},
+          };
+          const result =await userCollection.updateOne(filter,updateDoc);
+          res.send({result});
+        });
+
         app.put('/user/:email',async(req,res)=>{
           const email=req.params.email;
           const user =req.body;
@@ -59,7 +76,7 @@ async function run(){
           const result =await userCollection.updateOne(filter,updateDoc,option);
           const token =jwt.sign({email:email},process.env.ACCESS_TOKEN_SECRET, {expiresIn:'1h'})
           res.send({result,token});
-        })
+        });
           //data inserting
         //api naming convention
         /**
