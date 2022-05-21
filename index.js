@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors')
 const jwt =require('jsonwebtoken');
 require('dotenv').config()
-const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId, ObjectID } = require('mongodb');
 const app = express();
 const port =process.env.PORT || 5000;
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
@@ -40,6 +40,7 @@ async function run(){
         const bookingCollection =client.db('doctor_portal').collection('bookings');
         const userCollection =client.db('doctor_portal').collection('users');
         const doctorCollection =client.db('doctor_portal').collection('doctors');
+        const paymentCollection =client.db('doctor_portal').collection('payments');
 
       
         const verifyAdmin =async(req,res,next)=>{
@@ -102,6 +103,24 @@ async function run(){
           
    
         });
+
+        app.patch('/booking/:id',verifyJWT,async(req,res)=>{
+          const id =req.params.id;
+          const payment =req.body;
+          const filter ={_id:ObjectId(id)}
+          const  updateDoc={
+            $set:{
+              paid:true,
+              transactionid: payment.transactionid,
+
+
+            }
+          }
+          const result = await paymentCollection.insertOne(payment);
+          const updatedBooking =await bookingCollection.updateOne(filter,updateDoc);
+          res.send(updateDoc);
+
+        })
 
         app.put('/user/:email',async(req,res)=>{
           const email=req.params.email;
