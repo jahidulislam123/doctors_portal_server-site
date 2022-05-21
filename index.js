@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors')
 const jwt =require('jsonwebtoken');
 require('dotenv').config()
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const app = express();
 const port =process.env.PORT || 5000;
 
@@ -177,6 +177,12 @@ async function run(){
           return  res.send({success:true, result});
         })
 
+        app.get('/booking/:id', verifyJWT, async(req,res)=>{
+          const id=req.params.id;
+          const query = {_id:ObjectId(id)}
+          const booking =await bookingCollection.findOne(query);
+          res.send(booking);
+        })
 
         app.get('/doctor',verifyJWT,verifyAdmin ,async(req,res)=>{
           const doctors =await doctorCollection.find().toArray();
